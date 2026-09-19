@@ -1,0 +1,35 @@
+# The games this application ships with, in the order the shelf lists them.
+#
+# One line per game:
+#
+#     id | title | licence | upstream
+#
+# `id` is the name the cart has on wasm4.org, which is also the name of its
+# `.wasm` file under Source/carts and of its cover under Source/covers.
+# `title` is what the shelf shows. `licence` and `upstream` are what
+# THIRD-PARTY.md reports, so a game's terms travel with the line that ships it.
+#
+# Adding a game is this one line. `make assets` then downloads the cart and
+# regenerates the shelf's list and the table in THIRD-PARTY.md;
+# `tools/covers/generate.sh` renders its cover.
+#
+# Most of these carry a permissive licence from their own upstream repository.
+# A game published on wasm4.org without one is CC BY-NC-SA 4.0 by default, per
+# site/docs/guides/distribution.md in the WASM-4 repository; one such game is
+# listed below. Its terms are recorded in its line and reported in
+# THIRD-PARTY.md, and nothing here is sold. Whatever the licence, record the
+# real one: the table people read for compliance is generated from this column.
+
+watris          | Watris         | ISC          | `aduros/wasm4`, `examples/watris`
+snake           | Snake          | ISC          | `aduros/wasm4`, tutorial
+2048            | 2048           | MIT          | github.com/peterhellberg/w4-2048
+corn            | Corn           | MIT          | github.com/SLiV9/corn
+one-slime-army  | One Slime Army | ISC          | github.com/ibillingsley/wasm4-gamejam
+zxz             | ZxZ            | BSD-2-Clause | github.com/drcz/ZxZ
+tictactoe       | Tic Tac Toe    | BSD-2-Clause | github.com/christopher-kleine/tic-tac-toe-wasm4
+mazethingie     | Maze Thingie   | MIT          | github.com/joyrider3774/mazethingie_wasm4
+platformer-test | Platformer     | ISC          | `aduros/wasm4`, `examples/platformer-test`
+sound-demo      | Sound Demo     | ISC          | `aduros/wasm4`, `examples/sound-demo`
+raw-assembly    | Raw Assembly   | ISC          | `aduros/wasm4`, `examples/raw-assembly`
+number-slide    | Number Slide   | CC BY-NC-SA 4.0 | wasm4.org/play/number-slide, by Giovana Ferreira Waterkemper and Jamily Goncalves de Sales Souza
+smash-sugar-parallelepipeds | Smash Sugar Parallelepipeds | CC BY-NC-SA 4.0 | wasm4.org/play/smash-sugar-parallelepipeds, by Lázaro Albuquerque (lzralbu.itch.io)

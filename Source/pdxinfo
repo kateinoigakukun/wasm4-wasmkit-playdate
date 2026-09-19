@@ -1,0 +1,7 @@
+name=WASM-4
+author=Yuta Saito
+description=A WASM-4 fantasy console runtime powered by WasmKit and Embedded Swift
+bundleID=dev.katei.wasm4
+version=0.1
+buildNumber=1
+imagePath=

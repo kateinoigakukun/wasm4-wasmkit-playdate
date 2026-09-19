@@ -1,0 +1,68 @@
+name: CI
+
+# The device build is the only one that exercises the bare-metal target, so it
+# runs on every change. The cart runner is the only thing CI can actually
+# execute: the Playdate Simulator is a GUI application and running it headless
+# is unsolved, which is why the console emulation is kept free of any Playdate
+# dependency and testable on its own.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Pinned rather than "latest": this repository is meant to still build
+      # after the blog post that links to it has gone stale. The layout below
+      # was verified against 3.1.2 -- the package payload contains a single
+      # PlaydateSDK directory, not the SDK contents directly.
+      - name: Install the Playdate SDK
+        run: |
+          set -eux
+          curl -fsSL -o PlaydateSDK.zip \
+            https://download.panic.com/playdate_sdk/PlaydateSDK-3.1.2.zip
+          unzip -q PlaydateSDK.zip -d dist
+          pkgutil --expand-full dist/PlaydateSDK.pkg expanded
+          mv expanded/PlaydateSDK.pkg/Payload/PlaydateSDK "$HOME/Playdate"
+          test -x "$HOME/Playdate/bin/pdc"
+
+      # The SDK package does not contain a compiler: Panic's installer fetches
+      # one separately as a post-install step, which this deliberately does not
+      # rely on. Note the version differs from the 9.2.1 the installer places
+      # locally; the Makefile locates whatever is on PATH.
+      - name: Install an arm-none-eabi toolchain
+        run: |
+          set -eux
+          brew install --cask gcc-arm-embedded
+          arm-none-eabi-gcc --version | head -1
+
+      - name: Install the Swift toolchain
+        run: |
+          set -eux
+          curl -fsSL -o swift.pkg \
+            https://download.swift.org/swift-6.4.0-release/xcode/swift-6.4.0-RELEASE/swift-6.4.0-RELEASE-osx.pkg
+          installer -pkg swift.pkg -target CurrentUserHomeDirectory
+          # The installed directory name does not always match the download
+          # name (6.4 vs 6.4.0), so discover it rather than assume it.
+          toolchain=$(ls -d "$HOME"/Library/Developer/Toolchains/*.xctoolchain | head -1)
+          test -d "$toolchain/usr/lib/swift/embedded/armv7em-none-none-eabi"
+          echo "TOOLCHAIN=$toolchain" >> "$GITHUB_ENV"
+
+      - name: Run every cart headlessly
+        run: make smoke TOOLCHAIN="$TOOLCHAIN"
+
+      - name: Build for the device
+        run: |
+          make device SDK="$HOME/Playdate" TOOLCHAIN="$TOOLCHAIN"
+          ls -l build/wasm4.pdx
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wasm4.pdx
+          path: build/wasm4.pdx
